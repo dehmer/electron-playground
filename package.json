@@ -2,13 +2,26 @@
   "name": "electron-playground",
   "version": "1.0.0",
   "description": "",
-  "main": "main.js",
+  "main": "dist/main.js",
   "scripts": {
-    "start": "electron ."
+    "start": "electron . --cold",
+    "webpack": "webpack",
+    "hot": "webpack serve"
   },
   "author": "",
   "license": "ISC",
   "devDependencies": {
-    "electron": "^19.0.8"
+    "@babel/preset-env": "^7.18.9",
+    "@babel/preset-react": "^7.18.6",
+    "babel-loader": "^8.2.5",
+    "electron": "^19.0.8",
+    "html-webpack-plugin": "^5.5.0",
+    "webpack": "^5.73.0",
+    "webpack-cli": "^4.10.0",
+    "webpack-dev-server": "^4.9.3"
+  },
+  "dependencies": {
+    "react": "^18.2.0",
+    "react-dom": "^18.2.0"
   }
 }

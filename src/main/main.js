@@ -1,8 +1,35 @@
-const { app, BrowserWindow } = require('electron')
-const path = require('path')
+import { app, BrowserWindow } from 'electron'
+import path from 'path'
+
+const execPath = process.execPath
+const appPath = app => app.getAppPath()
+const staticIndexPage = app => path.join(appPath(app), 'dist', 'index.html')
+const preloadPath = app => path.join(appPath(app), 'dist', 'preload.js')
+const windowUrl = app => {
+  const notCold = process.argv.indexOf('--cold') === -1
+
+  /*
+    HMR (webpack development server) won't work with
+    context isolation active and node integration turned off.
+
+    (renderer)
+    Uncaught ReferenceError: global is not defined
+      at jsonp chunk loading:42:1
+      at jsonp chunk loading:511:1
+      at startup:6:1
+  */
+
+  const hot = process.defaultApp ||
+    /[\\/]electron-prebuilt[\\/]/.test(execPath) ||
+    /[\\/]electron[\\/]/.test(execPath)
+
+  return (hot && notCold)
+    ? new URL('index.html', 'http://localhost:8080')
+    : new URL(staticIndexPage(app), 'file:')
+}
 
 const createWindow = () => {
-  const mainWindow = new BrowserWindow({
+  const window = new BrowserWindow({
     width: 800,
     height: 600,
     webPreferences: {
@@ -18,11 +45,12 @@ const createWindow = () => {
       // run in the page. This script will always have access to
       // node APIs no matter whether node integration is turned on or off.
       //
-      preload: path.join(__dirname, 'preload.js')
+      preload: preloadPath(app)
     }
   })
 
-  mainWindow.loadFile('index.html')
+  window.loadURL(windowUrl(app).toString())
+
 }
 
 // This method will be called when Electron has finished
