@@ -17,3 +17,20 @@ Speaking of security: Web security is turned off in NIDO as well. At least durin
 Closing for tonight: node integration, context isolation and web security are all good and well. But what about native LevelDB support in our trusted renderers? From what I understand LevelDB scales down to IndexedDB API/implementation when used in browser environment. I'm pretty sure that I/O performance is really poor compared to native implementation. Also available database memory might be limited to ridiculous low numbers.
 
 These topics are the very first I will try to understand: How much slower is LevelDB in browser flavor? Is native LevelDB possible without compromising security as advocated by the Electron creators. Stay tuned for a new episode, where we add Webpack to the build and can configure native modules to be packaged and used.
+
+#### July 20, 2022 - Webpack and Security
+
+Dear diary! Today I implemented Webpack build. There's nothing new here. Just copied Webpack configuration from NIDO and made a few adjustments. But having Webpack was just an intermediate step. The primary goal was to see how context isolation and missing node integration would impact a more serious setup. To make a long story short: Fuck security!
+
+At least two issues pop up with context isolation enabled and node integration disabled. First: Webpack Development Server (i.e. HMR) does not work => `Uncaught ReferenceError: global is not defined`. Second: Certain dependencies require `require` to be available, which is not without node integration. `levelup` for example is such a module => `Uncaught ReferenceError: require is not defined`. While there where a few pointers concerning the first problem (naturally without fixes), the second issue should be no surprise. From the introduction of `levelup` GitHub page:
+
+> Fast and simple storage. A Node.js wrapper for abstract-leveldown compliant stores, which follow the characteristics of LevelDB.
+
+There you have it! A **Node.js wrapper** will probably have a hard time with node integration turned off. BTW: Enabling node integration with context isolation won't do for `levelup` either. Summing up, there is no way around this for the moment:
+
+```javascript
+webPreferences: {
+  nodeIntegration: true, // default: false
+  contextIsolation: false, // default: true, since 12.0.0
+}
+```

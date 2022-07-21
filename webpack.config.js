@@ -59,7 +59,6 @@ const rendererConfig = (env, argv) => ({
   plugins: [
     // Title is managed by BrowserWindow title option.
     new HtmlWebpackPlugin(),
-    new webpack.IgnorePlugin({ resourceRegExp: /^pg-native$/ }),
     new webpack.ExternalsPlugin('commonjs', ['leveldown'])
   ]
 })
@@ -76,19 +75,6 @@ const mainConfig = (env, argv) => ({
     // NOTE: Required. Else "Error: No native build was found for ..."
     new webpack.ExternalsPlugin('commonjs', ['leveldown'])
   ]
-})
-
-const preloadConfig = (env) => ({
-  context: path.resolve(__dirname, 'src/main'),
-  entry: {
-    preload: './preload.js'
-  },
-  target: 'electron-preload',
-  mode: mode(env),
-  // output: {
-  //   path: path.join(__dirname, 'dist'),
-  //   filename: 'preload.bundled.js'
-  // }
 })
 
 const devServer = env => {
@@ -132,6 +118,5 @@ module.exports = (env, argv) => {
   )
 
   const main = mainConfig(env, argv)
-  const preload = preloadConfig(env)
-  return [renderer, main, preload]
+  return [renderer, main]
 }

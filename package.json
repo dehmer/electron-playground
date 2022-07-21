@@ -4,7 +4,7 @@
   "description": "",
   "main": "dist/main.js",
   "scripts": {
-    "start": "electron . --cold",
+    "start": "electron . --static",
     "webpack": "webpack",
     "hot": "webpack serve"
   },

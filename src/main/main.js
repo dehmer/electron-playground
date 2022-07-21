@@ -1,31 +1,12 @@
 import { app, BrowserWindow } from 'electron'
 import path from 'path'
 
-const execPath = process.execPath
 const appPath = app => app.getAppPath()
-const staticIndexPage = app => path.join(appPath(app), 'dist', 'index.html')
-const preloadPath = app => path.join(appPath(app), 'dist', 'preload.js')
-const windowUrl = app => {
-  const notCold = process.argv.indexOf('--cold') === -1
-
-  /*
-    HMR (webpack development server) won't work with
-    context isolation active and node integration turned off.
-
-    (renderer)
-    Uncaught ReferenceError: global is not defined
-      at jsonp chunk loading:42:1
-      at jsonp chunk loading:511:1
-      at startup:6:1
-  */
-
-  const hot = process.defaultApp ||
-    /[\\/]electron-prebuilt[\\/]/.test(execPath) ||
-    /[\\/]electron[\\/]/.test(execPath)
-
-  return (hot && notCold)
-    ? new URL('index.html', 'http://localhost:8080')
-    : new URL(staticIndexPage(app), 'file:')
+const indexHTML = app => path.join(appPath(app), 'dist', 'index.html')
+const windowURL = app => {
+  return process.argv.indexOf('--static') !== -1
+    ? new URL(indexHTML(app), 'file:')
+    : new URL('index.html', 'http://localhost:8080')
 }
 
 const createWindow = () => {
@@ -33,24 +14,13 @@ const createWindow = () => {
     width: 800,
     height: 600,
     webPreferences: {
-      nodeIntegration: false, // default: false
-
-      // Even when nodeIntegration: false is used, to truly enforce
-      // strong isolation and prevent the use of Node primitives
-      // contextIsolation must also be used.
-      //
-      contextIsolation: true, // default: true, since 12.0.0
-
-      // Specifies a script that will be loaded before other scripts
-      // run in the page. This script will always have access to
-      // node APIs no matter whether node integration is turned on or off.
-      //
-      preload: preloadPath(app)
+      // Required by dependencies such as levelup and possibly others:
+      nodeIntegration: true, // default: false
+      contextIsolation: false, // default: true, since 12.0.0
     }
   })
 
-  window.loadURL(windowUrl(app).toString())
-
+  window.loadURL(windowURL(app).toString())
 }
 
 // This method will be called when Electron has finished

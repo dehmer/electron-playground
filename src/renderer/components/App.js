@@ -1,9 +1,7 @@
 import React from 'react'
 
 export const App = () => {
-
-  // Exposed by context bridge in preload script.
-  const versions = window.api.versions()
+  const versions = process.versions
 
   return (
     <>
