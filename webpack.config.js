@@ -15,8 +15,8 @@ const RULES = {
     // style-loader: wrap CSS string from css-loader with <style> tag
     // Note: loaders are applied from right to left, i.e. css-loader -> style-loader
     //
-    test: /\.css$/,
-    use: ['style-loader', 'css-loader']
+    test: /\.(scss|css)$/,
+    use: ['style-loader', 'css-loader', 'sass-loader']
   },
 
   image: {

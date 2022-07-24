@@ -34,3 +34,22 @@ webPreferences: {
   contextIsolation: false, // default: true, since 12.0.0
 }
 ```
+
+#### July 20, 2022 - Sassy CSS
+
+Dear diary! Long time no see! Today it's time to look into SCSS. An awful lot of CodePen and CodeSandbox examples are based on SCSS. It is not always easy to transpile this code to CSS in your head on-the-fly. At least my head is a pretty bad transpiler. While it might be beneficial to learn CSS from scratch without any fancy-pancy syntax, at some point it is probably worthwhile to learn something new. SASS and SCSS are around for quite some time now (some odd 15 years) and developers seem to have adopted this technology deep and wide. As a side note: SASS is a bit older than SCSS and uses indentation to structure code. SCSS is more in line with CSS parenthesis usage. Setting up Webpack with SASS is a piece of cake. Throw in a SASS itself, a few loaders and a CSS/SCSS rule and you're done.
+
+```
+$ npm install -D node-sass sass-loader css-loader style-loader
+```
+
+And somewhere in Webpack configuration:
+
+```json
+{
+  test: /\.(scss|css)$/,
+  use: ['style-loader', 'css-loader', 'sass-loader']
+}
+```
+
+That's it! Now for the funny part: Learning SCSS syntax and its advantages over plain and boring CSS. More on that some other fine day. Sleep well dear diary!
