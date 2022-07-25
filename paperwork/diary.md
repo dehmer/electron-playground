@@ -53,3 +53,56 @@ And somewhere in Webpack configuration:
 ```
 
 That's it! Now for the funny part: Learning SCSS syntax and its advantages over plain and boring CSS. More on that some other fine day. Sleep well dear diary!
+
+#### July 21, 2022 - ESLint
+
+ESLint undoubtedly can help prevent errors which are not always obvious to a developers casual eye. For me one of the more frequent mistakes is missing dependencies in React hooks. Might be that I am already relying too much on ESLint to spot these error and report them immediately back to me. This entry just summarizes the steps necessary to setup VSCode and Webpack to complain whenever I mess things up. Let's start with Webpack, because running a Webpack build gives fast feedback if all dependencies are in place and the configuration is in order.
+
+.eslint.rc (from NIDO):
+
+```javascript
+module.exports = {
+  settings: { react: { version: 'detect' } },
+  env: { browser: true, es6: true, node: true, mocha: true },
+  extends: ['eslint:recommended', 'plugin:react/recommended', 'standard'],
+  globals: { Atomics: 'readonly', SharedArrayBuffer: 'readonly' },
+  parser: '@babel/eslint-parser',
+  parserOptions: { ecmaFeatures: { jsx: true }, ecmaVersion: 2018, sourceType: 'module' },
+  plugins: ['react', 'react-hooks'],
+  rules: {
+   /* configure rules as desired */
+  }
+}
+```
+
+Required development dependencies for Webpack:
+
+```console
+npm install eslint-webpack-plugin --save-dev # NOTE: maintained by community not by webpack
+npm install eslint-plugin-react --save-dev
+npm install eslint-plugin-react-hooks --save-dev
+npm install eslint-config-standard --save-dev
+npm install @babel/eslint-parser --save-dev
+```
+
+Add Webpack ESLint plugin to Webpack configuration(s):
+
+E.g.: webpack.config.js:
+
+```javascript
+const ESLintPlugin = require('eslint-webpack-plugin')
+
+module.exports = {
+  // ...
+  plugins: [new ESLintPlugin(/* options */)]
+}
+```
+
+ESLint plugin for Visual Studio Code also requires an ESLint installation, either in local workspace or installed globally. Restarting Visual Studio Code might be required though.
+
+```console
+npm install eslint --save-dev
+```
+
+And that was it for tonight's installation. ESLint is up and running and thus helping us to focus on the more interesting stuff.
+

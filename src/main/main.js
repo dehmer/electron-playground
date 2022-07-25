@@ -16,7 +16,7 @@ const createWindow = () => {
     webPreferences: {
       // Required by dependencies such as levelup and possibly others:
       nodeIntegration: true, // default: false
-      contextIsolation: false, // default: true, since 12.0.0
+      contextIsolation: false // default: true, since 12.0.0
     }
   })
 
@@ -31,7 +31,6 @@ app.whenReady().then(() => {
   createWindow()
 
   app.on('activate', () => {
-
     // On macOS it's common to re-create a window in the app when the
     // dock icon is clicked and there are no other windows open.
     // Note: BrowserWindow has a ton of (static) functions which might

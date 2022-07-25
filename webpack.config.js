@@ -1,6 +1,7 @@
 const path = require('path')
 const { spawn } = require('child_process')
 const HtmlWebpackPlugin = require('html-webpack-plugin')
+const ESLintPlugin = require('eslint-webpack-plugin')
 const webpack = require('webpack')
 
 const RULES = {
@@ -59,7 +60,8 @@ const rendererConfig = (env, argv) => ({
   plugins: [
     // Title is managed by BrowserWindow title option.
     new HtmlWebpackPlugin(),
-    new webpack.ExternalsPlugin('commonjs', ['leveldown'])
+    new webpack.ExternalsPlugin('commonjs', ['leveldown']),
+    new ESLintPlugin()
   ]
 })
 
@@ -73,7 +75,8 @@ const mainConfig = (env, argv) => ({
   },
   plugins: [
     // NOTE: Required. Else "Error: No native build was found for ..."
-    new webpack.ExternalsPlugin('commonjs', ['leveldown'])
+    new webpack.ExternalsPlugin('commonjs', ['leveldown']),
+    new ESLintPlugin()
   ]
 })
 
