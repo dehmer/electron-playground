@@ -1,8 +1,9 @@
 import React from 'react'
+import * as Hooks from './hooks'
 import './App.scss'
 
 export const App = () => {
-  const versions = process.versions
+  const versions = Hooks.useServices('versions')
 
   return (
     <>

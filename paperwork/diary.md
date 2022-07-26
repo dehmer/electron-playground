@@ -26,7 +26,7 @@ At least two issues pop up with context isolation enabled and node integration d
 
 > Fast and simple storage. A Node.js wrapper for abstract-leveldown compliant stores, which follow the characteristics of LevelDB.
 
-There you have it! A **Node.js wrapper** will probably have a hard time with node integration turned off. BTW: Enabling node integration with context isolation won't do for `levelup` either. Summing up, there is no way around this for the moment:
+Ah! A **Node.js wrapper** will probably have a hard time with node integration turned off. BTW: Enabling node integration with context isolation won't do for `levelup` either. Summing up, there is no way around this for the moment:
 
 ```javascript
 webPreferences: {
@@ -104,5 +104,112 @@ ESLint plugin for Visual Studio Code also requires an ESLint installation, eithe
 npm install eslint --save-dev
 ```
 
-And that was it for tonight's installation. ESLint is up and running and thus helping us to focus on the more interesting stuff.
+And that was it for tonight's installment. ESLint is up and running and thus helping us to focus on the more interesting stuff.
+
+#### July 22, 2022 - React Service Context
+
+Some React components need some sort of dependencies, at least the decent ones. Be it to retrieve or store state or to otherwise communicate with different parts of the system. I am reluctant to use the term Dependency Injection in this context, because it is a broader and more general topic. But alas, we want to inject services to components nonetheless. Using global modules imported in the context of a component is only valid in the most simple cases. As soon as services depend on each other (read dependency graph) things get messy and out of hand quite fast. Also considered must be the need to setup services in an asynchronous manner. Say we want to provide some sort of store which needs additional setup, like asynchronously inserting required default values on first start or migrate data between versions. 
+
+Contrary to prop drilling, React's own Context API is ideal for the static nature of services which are usually setup once on startup and stay put for the remaining time. Show me the code already!
+
+hooks.js:
+
+```javascript
+import React from 'react'
+
+const ServiceContext = React.createContext({})
+
+export const ServiceProvider = props => {
+  const { children, ...services } = props
+
+  return (
+    <ServiceContext.Provider value={services}>
+      {children}
+    </ServiceContext.Provider>
+  )
+}
+
+/**
+ * useServices :: () => {k, v}
+ * useServices :: [k] => [v]
+ * useServices :: k => v
+ */
+export const useServices = arg => {
+  const services = React.useContext(ServiceContext)
+  return arg
+    ? Array.isArray(arg)
+      ? arg.map(key => services[key])
+      : services[arg]
+    : services
+}
+```
+
+Here we opt for a single context for all services. `ServiceContext` receives an associative array with all services registered under their respective keys. Context nesting might be also possible, but it is not practical for more than two or three levels. `ServiceProvider` is used to somewhere way up in the component hierarchy for child components to be useful. But instead of using `ServiceProvider` directly, it is wrapped by `ServiceContext` component which deals with the asynchronous process to setup the services.
+
+ServiceContext.js
+
+```javascript
+import React from 'react'
+import { ServiceProvider } from './hooks'
+
+export const ServiceContext = ({ children, provider }) => {
+  const [services, setServices] = React.useState(null)
+  React.useEffect(() => { provider().then(setServices) }, [provider])
+
+  return services && (
+    <ServiceProvider { ...services }>
+      {children}
+    </ServiceProvider>
+  )
+}
+```
+
+`ServiceContext` accepts an asynchronous provider function which actually creates the services. Only when this promise is resolved this part of the component hierarchy is rendered.
+
+index.js:
+
+```javascript
+import React from 'react'
+import { createRoot } from 'react-dom/client'
+import { ServiceContext } from './components/ServiceContext'
+import { App } from './components/App'
+
+const services = async () => ({
+  versions: process.versions
+})
+
+const container = document.createElement('div')
+document.body.appendChild(container)
+const root = createRoot(container)
+root.render(
+  <ServiceContext provider={services}>
+    <App/>
+  </ServiceContext>
+)
+```
+
+In this example `ServiceContext` is actually the first node in the hierarchy. Finally for the actual application through `useServices()` hook.
+
+App.js:
+
+```javascript
+import React from 'react'
+import * as Hooks from './hooks'
+import './App.scss'
+
+export const App = () => {
+  const versions = Hooks.useServices('versions')
+
+  return (
+    <>
+      <h1>Hello World!</h1>
+      We are using Node.js <span>{versions.node}</span>,
+      Chromium <span>{versions.chrome}</span>,
+      and Electron <span>{versions.electron}</span>.
+    </>
+  )
+}
+```
+
+There you have it! Clean and simple (I think). This pattern proved valuable in NIDO for quite some time now. It is easy enough to understand and scales well will increasing demands on service setup and inter-service dependencies. What's more, it probably simplifies component testing dramatically. But that's a topic I might look into in some unknown future.
 

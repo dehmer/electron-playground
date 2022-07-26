@@ -7,11 +7,9 @@ module.exports = {
   parserOptions: { ecmaFeatures: { jsx: true }, ecmaVersion: 2018, sourceType: 'module' },
   plugins: ['react', 'react-hooks'],
   rules: {
-    'no-multiple-empty-lines': 'off'
-    // 'no-console': 'off',
-    // 'padded-blocks': 'off',
-    // 'react/display-name': 'off',
-    // 'react-hooks/rules-of-hooks': 'error',
-    // 'react-hooks/exhaustive-deps': 'warn'
+    'no-multiple-empty-lines': 'off',
+    'react/prop-types': 'off', // turn on for paranoid mode
+    'react-hooks/rules-of-hooks': 'error',
+    'react-hooks/exhaustive-deps': 'warn'
   }
 }

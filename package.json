@@ -31,7 +31,12 @@
     "webpack-dev-server": "^4.9.3"
   },
   "dependencies": {
+    "encoding-down": "^7.1.0",
+    "levelup": "^5.1.1",
+    "memdown": "^6.1.1",
+    "ramda": "^0.28.0",
     "react": "^18.2.0",
-    "react-dom": "^18.2.0"
+    "react-dom": "^18.2.0",
+    "react-fast-compare": "^3.2.0"
   }
 }
