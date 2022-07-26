@@ -8,6 +8,7 @@ module.exports = {
   plugins: ['react', 'react-hooks'],
   rules: {
     'no-multiple-empty-lines': 'off',
+    'no-unused-vars': 'warn',
     'react/prop-types': 'off', // turn on for paranoid mode
     'react-hooks/rules-of-hooks': 'error',
     'react-hooks/exhaustive-deps': 'warn'

@@ -61,7 +61,11 @@ const rendererConfig = (env, argv) => ({
     // Title is managed by BrowserWindow title option.
     new HtmlWebpackPlugin(),
     new webpack.ExternalsPlugin('commonjs', ['leveldown']),
-    new ESLintPlugin()
+    new ESLintPlugin({
+      // Let HMR do its thing even with warnings.
+      // Warnings are mainly useful in vsc.
+      emitWarning: false
+    })
   ]
 })
 

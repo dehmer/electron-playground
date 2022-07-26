@@ -26,7 +26,7 @@ At least two issues pop up with context isolation enabled and node integration d
 
 > Fast and simple storage. A Node.js wrapper for abstract-leveldown compliant stores, which follow the characteristics of LevelDB.
 
-Ah! A **Node.js wrapper** will probably have a hard time with node integration turned off. BTW: Enabling node integration with context isolation won't do for `levelup` either. Summing up, there is no way around this for the moment:
+There you have it! A **Node.js wrapper** will probably have a hard time with node integration turned off. BTW: Enabling node integration with context isolation won't do for `levelup` either. Summing up, there is no way around this for the moment:
 
 ```javascript
 webPreferences: {
@@ -106,9 +106,9 @@ npm install eslint --save-dev
 
 And that was it for tonight's installment. ESLint is up and running and thus helping us to focus on the more interesting stuff.
 
-#### July 22, 2022 - React Service Context
+#### July 22, 2022 - Chapter 1 - React Service Context
 
-Some React components need some sort of dependencies, at least the decent ones. Be it to retrieve or store state or to otherwise communicate with different parts of the system. I am reluctant to use the term Dependency Injection in this context, because it is a broader and more general topic. But alas, we want to inject services to components nonetheless. Using global modules imported in the context of a component is only valid in the most simple cases. As soon as services depend on each other (read dependency graph) things get messy and out of hand quite fast. Also considered must be the need to setup services in an asynchronous manner. Say we want to provide some sort of store which needs additional setup, like asynchronously inserting required default values on first start or migrate data between versions. 
+Some React components need some sort of dependencies, at least the decent ones. Be it to retrieve or store state or to otherwise communicate with different parts of the system. I am reluctant to use the term Dependency Injection in this context, because it is a broader and more general topic. But alas, we want to inject services to components nonetheless. Using global modules imported in the context of a component is only valid in the most simple cases. As soon as services depend on each other (read dependency graph) things get messy and out of hand quite fast. Also considered must be the need to setup services in an asynchronous manner. Say we want to provide some sort of store which needs additional setup, like asynchronously inserting required default values on first start or migrate data between versions.
 
 Contrary to prop drilling, React's own Context API is ideal for the static nature of services which are usually setup once on startup and stay put for the remaining time. Show me the code already!
 
@@ -212,4 +212,70 @@ export const App = () => {
 ```
 
 There you have it! Clean and simple (I think). This pattern proved valuable in NIDO for quite some time now. It is easy enough to understand and scales well will increasing demands on service setup and inter-service dependencies. What's more, it probably simplifies component testing dramatically. But that's a topic I might look into in some unknown future.
+
+#### July 22, 2022 - Chapter 2 - Two-way Binding
+
+Hello again! Following is a quick writeup of a simple two-way binding of a database value and a React component state. Meet `useMemento()` hook.
+
+```javascript
+export const App = () => {
+  const [scope, setScope] = Hooks.useMemento('ui.sidebar.scope')
+	...
+}
+```
+
+This sure looks similar to React.useState() and also feels quite like it. The difference is for once, the value behind key `ui.sidebar.scope` is retrieved and written from and to the database and that whenever the value changes, the state `scope` is updated accordingly. Even if some other part of the application triggered the update. Another subtle difference is that the value is only available **after** the first render cycle (or event somewhat later). This is because value is fetched asynchronously and takes at least two ticks to be available (including the read request.) I guess that it is not hard to imagine how to make good use of our new friend. It's time to have a peak under the hood.
+
+hooks.js:
+
+```javascript
+export const useMemento = key => {
+  const { store } = useServices()
+  const [value, setValue] = React.useState(null)
+  const put = React.useCallback(value => { store.put(key, value) }, [store, key])
+
+  React.useEffect(() => {
+    // Get initial value; expect key to be present.
+    (async () => setValue(await store.get(key)))()
+    const handler = (k, v) => k === key && setValue(v)
+    store.on('put', handler)
+    return () => store.off('put', handler)
+  }, [store, key])
+
+  return [value, put]
+}
+```
+
+Not overly complicated, right? Nevertheless, there is an important detail which should be understood: The `useCallback()` on `put` operation. Imagine for a moment that `put` would be as simple as `value => store.put(key, value)`. In this case, every value change would also change the reference to `put` in the hooks result to a new function instance. On the callers site this would invalidate hooks directly and indirectly depending on this function (`setScope` in the example above.) At a later point we will have a closer look at  `useMemento`s four line effect code. This code is pretty straight forward and not hard to understand, but I don't like it too much.
+
+Ah, sorry! I almost forgot that the service context (remember?) had to learn a few new tricks for `useMemento()` to work:
+
+index.js:
+
+```javascript
+import levelup from 'levelup'
+import memdown from 'memdown'
+import encode from 'encoding-down'
+import uuid from 'uuid-random'
+
+const services = async () => {
+  const versions = process.versions
+  const scopes = ['layer', 'feature', 'link', 'symbol', 'marker']
+  const randomScope = () => scopes[Math.floor(Math.random() * scopes.length)]
+  const store = levelup(encode(memdown(), { valueEncoding: 'json' }))
+
+  await store.batch([
+    { type: 'put', key: 'ui.sidebar.showing', value: true },
+    { type: 'put', key: 'ui.sidebar.scope', value: scopes[0] },
+    { type: 'put', key: 'ui.sidebar.filter', value: uuid() }
+  ])
+
+  return {
+    versions,
+    store,
+    scopes,
+    randomScope
+  }
+}
+```
 
