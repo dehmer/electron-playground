@@ -5,7 +5,7 @@ import memdown from 'memdown'
 import encode from 'encoding-down'
 import uuid from 'uuid-random'
 import { ServiceContext } from './components/ServiceContext'
-import { App } from './components/Memento'
+import { Wrapper } from './components/Memento'
 
 const services = async () => {
   const versions = process.versions
@@ -32,6 +32,6 @@ document.body.appendChild(container)
 const root = createRoot(container)
 root.render(
   <ServiceContext provider={services}>
-    <App/>
+    <Wrapper/>
   </ServiceContext>
 )

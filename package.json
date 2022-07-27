@@ -31,7 +31,10 @@
     "webpack-dev-server": "^4.9.3"
   },
   "dependencies": {
+    "@most/core": "^1.6.1",
+    "@most/scheduler": "^1.3.0",
     "encoding-down": "^7.1.0",
+    "leveldown": "^6.1.1",
     "levelup": "^5.1.1",
     "memdown": "^6.1.1",
     "ramda": "^0.28.0",
