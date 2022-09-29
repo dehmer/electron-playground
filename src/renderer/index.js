@@ -5,7 +5,8 @@ import memdown from 'memdown'
 import encode from 'encoding-down'
 import uuid from 'uuid-random'
 import { ServiceContext } from './components/ServiceContext'
-import { App } from './components/Memento'
+// import { App } from './components/Memento'
+import { App } from './components/kbar/App'
 
 const services = async () => {
   const versions = process.versions
