@@ -279,3 +279,11 @@ const services = async () => {
 }
 ```
 
+#### September 29, 2022 - Color Picker
+
+Color picker, you say? What's the problem? There is a ton of components available to choose from. Just pick one and you're done! Well, no! Let's gather the requirements and see what we want to deliver.
+
+First we want to have an **input control** which serves as an anchor to open a color swatches popup or other means to choose a color. This control must display the current color in an easily recognizable way. The control should not take up too much horizontal space, because it will be combined with at least two additional controls in a single and rather narrow row. It must be possible to also display some sort of null value which means no color is selected. macOS Preview for example indicates null values by a red diagonal line on white background: <img src="./images/color-button--preview.png" style="zoom:50%;"/> macOS Pages uses a button group with two buttons. The left button opens a color swatches popup and the right button opens the native macOS color dialog: <img src="./images/color-buttons--pages.png" style="zoom:50%;"/> Microsoft Excel also consists of a button group, but here the left button applies the current color to the selected element and the right button opens a swatches popup: <img src="./images/color-button--excel.png" style="zoom:50%;"/>
+
+In general it should be possible to directly select a color from a set of predefined colors. Ideally, recently used colors are available as well. macOS native color dialog for example has room for 20 user defined colors:
+<img align="center" src="./images/color-picker--macOS.png" style="zoom:50%;"/> 

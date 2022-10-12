@@ -33,6 +33,7 @@
   "dependencies": {
     "@mdi/js": "^7.0.96",
     "@mdi/react": "^1.6.1",
+    "color": "^4.2.3",
     "encoding-down": "^7.1.0",
     "kbar": "^0.1.0-beta.36",
     "levelup": "^5.1.1",
