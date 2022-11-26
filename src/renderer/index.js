@@ -6,7 +6,8 @@ import encode from 'encoding-down'
 import uuid from 'uuid-random'
 import { ServiceContext } from './components/ServiceContext'
 // import { App } from './components/Memento'
-import { App } from './components/kbar/App'
+// import { App } from './components/kbar/App'
+import { App } from './components/interactions/App'
 
 const services = async () => {
   const versions = process.versions
